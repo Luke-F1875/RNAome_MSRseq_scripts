@@ -1,0 +1,61 @@
+---
+title: "refseq cleanup"
+authors: "Hoang-Anh Tran, Luke R Frietze"
+date: "2/12/2026"
+output: html_document
+---
+
+#READ ME
+```{r}
+#Script: refseq_cleanup.Rmd
+# Description:
+# Cleans the provided reference sequence, Step1_260_seq_hg38-mature-tRNAs.fa,into a format usable for the MSRseq pipeline. This will generate the Step1_260_seq_hg38-mature-tRNAs_renamed.fa file which can then be used by bowtie to be converted into a usable reference sequence for bowtie based alignment
+
+# Built with:
+#   R version 4.2.2 (2022-10-31)
+
+# Input:
+#   The reference sequence from Step1_260_seq_hg38-mature-tRNAs.fa
+
+# Output:
+#   Cleaned reference sequence from tep1_260_seq_hg38-mature-tRNAs_renamed.fa
+
+# Authors:
+#   Hoang-Anh Tran, Luke R Frietze
+
+# Date:
+#   2026-2-12
+
+# ============================================================
+
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# clean_fasta_headers.R
+# Purpose: read a FASTA (.fa/.fasta) file and write a new FASTA where
+#          any header like ">name=alias1=alias2" becomes ">name"
+# Usage (in RStudio): set `in_fa` and `out_fa`, then run.
+
+in_fa  <- "Step1_260_seq_hg38-mature-tRNAs.fa"
+out_fa <- "Step1_260_seq_hg38-mature-tRNAs_renamed.fa"
+
+lines <- readLines(in_fa, warn = FALSE)
+
+is_header <- startsWith(lines, ">")
+
+# For header lines:
+# 1) drop the leading ">"
+# 2) keep everything before the first "="
+# 3) rebuild header with ">"
+lines[is_header] <- paste0(">", sub("=.*$", "", substring(lines[is_header], 2)))
+
+writeLines(lines, out_fa)
+
+message("Wrote cleaned FASTA to: ", normalizePath(out_fa, winslash = "/", mustWork = FALSE))
+
+```
